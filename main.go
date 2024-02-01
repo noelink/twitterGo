@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/aws/aws-lambda-go/events"
 	lambda "github.com/aws/aws-lambda-go/lambda"
-	awsgo "github.com/ngonzalezo/twitterGo"
+	"github.com/ngonzalezo/twitterGo/awsgo"
 	"github.com/ngonzalezo/twitterGo/bd"
 	"github.com/ngonzalezo/twitterGo/handlers"
 	"github.com/ngonzalezo/twitterGo/models"
