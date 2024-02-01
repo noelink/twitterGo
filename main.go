@@ -1,4 +1,4 @@
-package awsgo
+package main
 
 import (
 	"context"
