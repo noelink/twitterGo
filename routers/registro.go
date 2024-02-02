@@ -48,7 +48,7 @@ func Registro(ctx context.Context) models.RespApi {
 		return r
 	}
 
-	if status {
+	if !status {
 		r.Message = "No se ha logrado insertar el registro del usuario"
 		fmt.Println(r.Message)
 		return r
