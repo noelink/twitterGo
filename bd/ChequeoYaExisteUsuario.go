@@ -2,11 +2,13 @@ package bd
 
 import (
 	"context"
+	"fmt"
 	"github.com/ngonzalezo/twitterGo/models"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func ChequeoYaExisteUsuario(email string) (models.Usuario, bool, string) {
+	fmt.Println("Ingreso a chequeoUsuario existente con email: ", email)
 	ctx := context.TODO()
 
 	db := MongoCN.Database(DatabaseName)
