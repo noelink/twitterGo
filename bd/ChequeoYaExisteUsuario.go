@@ -23,6 +23,6 @@ func ChequeoYaExisteUsuario(email string) (models.Usuario, bool, string) {
 	if err != nil {
 		return resultado, false, ID
 	}
-	//fmt.Println("resultado es : ", resultado)
+	fmt.Println("resultado es : ", resultado)
 	return resultado, true, ID
 }
