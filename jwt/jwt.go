@@ -14,7 +14,7 @@ func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 	miClave := []byte(jwtSign)
 	payload := jwt.MapClaims{
 		"email":            t.Email,
-		"nomnre":           t.Nombre,
+		"nombre":           t.Nombre,
 		"apellidos":        t.Apellidos,
 		"fecha_nacimiento": t.FechaNacimiento,
 		"biografia":        t.Biografia,
