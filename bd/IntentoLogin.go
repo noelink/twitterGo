@@ -7,7 +7,7 @@ import (
 )
 
 func IntentoLogin(email string, password string) (models.Usuario, bool) {
-	fmt.Println("Ingresamos a intento login")
+	fmt.Println("Ingresamos a intento login con email: ", email)
 	usu, encontrado, _ := ChequeoYaExisteUsuario(email)
 
 	if !encontrado {
