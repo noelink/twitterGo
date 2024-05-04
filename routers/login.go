@@ -16,7 +16,7 @@ func Login(ctx context.Context) models.RespApi {
 	var t models.Usuario
 	var r models.RespApi
 	r.Status = 400
-
+	fmt.Println("Ingresamos a login handler")
 	body := ctx.Value(models.Key("body")).(string)
 	err := json.Unmarshal([]byte(body), &t)
 
@@ -29,6 +29,7 @@ func Login(ctx context.Context) models.RespApi {
 		r.Message = "El email del usuario es requerido "
 		return r
 	}
+	fmt.Println("Vamoa a llamar a la funcion que intenta el loging")
 	userData, existe := bd.IntentoLogin(t.Email, t.Password)
 
 	if !existe {
