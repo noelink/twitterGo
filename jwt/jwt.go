@@ -9,9 +9,9 @@ import (
 )
 
 func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
+	fmt.Println("Entre a generacion de jwt")
 	jwtSign := ctx.Value(models.Key("jwtSign")).(string)
 	miClave := []byte(jwtSign)
-	fmt.Println("Entre a generacion de jwt")
 	payload := jwt.MapClaims{
 		"email":            t.Email,
 		"nomnre":           t.Nombre,
