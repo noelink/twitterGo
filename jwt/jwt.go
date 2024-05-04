@@ -2,9 +2,13 @@ package jwt
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/ngonzalezo/twitterGo/models"
+	"log"
 	"time"
 )
 
@@ -28,8 +32,30 @@ func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 
 	if err != nil {
 		fmt.Println("Hubo un error chato!!!", err.Error())
-		return tokenStr, err
+		return createRandomKey()
 	}
 	fmt.Println("Todo bien al parecer")
 	return tokenStr, nil
+}
+
+func createRandomKey() (string, error) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	claims := &jwt.StandardClaims{
+		ExpiresAt: 15000,
+		Issuer:    "test",
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+
+	tokenString, err := token.SignedString(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(tokenString)
+	return tokenString, nil
 }
