@@ -3,6 +3,7 @@ package routers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/ngonzalezo/twitterGo/bd"
 	"github.com/ngonzalezo/twitterGo/jwt"
@@ -69,6 +70,8 @@ func Login(ctx context.Context) models.RespApi {
 			"Set-Cookie":                  "*",
 		},
 	}
+
+	fmt.Println(cookieString)
 
 	r.Status = 200
 	r.Message = string(token)
