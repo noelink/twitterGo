@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"context"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ngonzalezo/twitterGo/models"
 	"time"
@@ -10,7 +11,7 @@ import (
 func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 	jwtSign := ctx.Value(models.Key("jwtSign")).(string)
 	miClave := []byte(jwtSign)
-
+	fmt.Println("Entre a generacion de jwt")
 	payload := jwt.MapClaims{
 		"email":            t.Email,
 		"nomnre":           t.Nombre,
@@ -26,7 +27,9 @@ func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 	tokenStr, err := token.SignedString(miClave)
 
 	if err != nil {
+		fmt.Println("Hubo un error chato!!!", err.Error())
 		return tokenStr, err
 	}
+	fmt.Println("Todo bien al parecer")
 	return tokenStr, nil
 }
