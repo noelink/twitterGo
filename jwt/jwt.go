@@ -31,6 +31,7 @@ func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 	tokenStr, err := token.SignedString(miClave)
 	fmt.Println("Clave generada que es segun invalida: ")
 	fmt.Printf("%v %v", tokenStr, err)
+	fmt.Println("")
 	if err != nil {
 		fmt.Println("Hubo un error chato!!!", err.Error())
 		return createRandomKey()
