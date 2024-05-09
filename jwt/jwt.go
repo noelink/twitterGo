@@ -28,6 +28,7 @@ func GeneroJWT(ctx context.Context, t models.Usuario) (string, error) {
 		"exp":              time.Now().Add(time.Hour * 24).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, payload)
+	fmt.Println("Clave generada que es sehun invalida: ", token)
 	tokenStr, err := token.SignedString(miClave)
 
 	if err != nil {
