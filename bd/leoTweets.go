@@ -25,10 +25,10 @@ func LeoTweets(ID string, pagina int64) ([]*models.DevuelvoTweets, bool) {
 	opciones.SetSkip((pagina - 1) * 20)
 
 	cursor, err := col.Find(ctx, condicion, opciones)
-
 	if err != nil {
 		return resultados, false
 	}
+
 	for cursor.Next(ctx) {
 		var registro models.DevuelvoTweets
 		err := cursor.Decode(&registro)

@@ -16,7 +16,7 @@ func LeoTweets(request events.APIGatewayProxyRequest) models.RespApi {
 	pagina := request.QueryStringParameters["pagina"]
 
 	if len(ID) < 1 {
-		r.Message = "El parametro ID es obligatorio"
+		r.Message = "El parámetro ID es obligatorio"
 		return r
 	}
 
@@ -25,21 +25,18 @@ func LeoTweets(request events.APIGatewayProxyRequest) models.RespApi {
 	}
 
 	pag, err := strconv.Atoi(pagina)
-
 	if err != nil {
-		r.Message = "Debe enviar el parametro Pagina como un valor mayor a 0"
+		r.Message = "Debe enviar el parámetro Pagina como un valor mayor a 0"
 		return r
 	}
 
 	tweets, correcto := bd.LeoTweets(ID, int64(pag))
-
 	if !correcto {
-		r.Message = "Error al leer los tweets"
+		r.Message = "Error al leer los Tweets"
 		return r
 	}
 
 	respJson, err := json.Marshal(tweets)
-
 	if err != nil {
 		r.Status = 500
 		r.Message = "Error al formatear los datos de los usuarios como JSON"
