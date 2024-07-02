@@ -11,7 +11,7 @@ func InsertoTweet(t models.GraboTweet) (string, bool, error) {
 	ctx := context.TODO()
 
 	db := MongoCN.Database(DatabaseName)
-	col := db.Collection("twee")
+	col := db.Collection("tweet")
 
 	registro := bson.M{
 		"userid":  t.UserID,
