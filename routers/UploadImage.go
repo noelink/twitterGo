@@ -55,7 +55,7 @@ func UploadImage(ctx context.Context, uploadType string, request events.APIGatew
 		mr := multipart.NewReader(bytes.NewReader(body), params["boundary"])
 		p, err := mr.NextPart()
 		if err != nil && err != io.EOF {
-
+			return r
 		}
 
 	} else {
