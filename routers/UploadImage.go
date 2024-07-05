@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -11,8 +12,6 @@ import (
 	"github.com/ngonzalezo/twitterGo/bd"
 	"github.com/ngonzalezo/twitterGo/models"
 	"io"
-	"mime"
-	"mime/multipart"
 	"strings"
 )
 
@@ -26,93 +25,76 @@ func (rs *readSeeker) Seek(offset int64, whence int) (int64, error) {
 
 func UploadImage(ctx context.Context, uploadType string, request events.APIGatewayProxyRequest, claim models.Claim) models.RespApi {
 
-	var r models.RespApi
-	r.Status = 400
-	IDUsuario := claim.ID.Hex()
+	var response models.RespApi
+	response.Status = 400
 
-	var filename string
-	var usuario models.Usuario
-
+	email := claim.Email
+	var fileName string
+	var user models.Usuario
 	bucket := aws.String(ctx.Value(models.Key("bucketName")).(string))
+	requestBody := request.Body
+
 	switch uploadType {
 	case "A":
-		filename = "avatars/" + IDUsuario + ".jpg"
-		usuario.Avatar = filename
+		{
+			fileName = "avatars/" + strings.Split(email, ".")[0] + ".jpg"
+			user.Avatar = fileName
+		}
 	case "B":
-		filename = "banners/" + IDUsuario + ".jpg"
-		usuario.Banner = filename
+		{
+			fileName = "banners/" + email + ".jpg"
+			user.Banner = fileName
+		}
 	}
 
-	mediaType, params, err := mime.ParseMediaType(request.Headers["Content-Type"])
+	var imageRequest models.ImageRequest
+
+	jsonError := json.Unmarshal([]byte(requestBody), &imageRequest)
+	if jsonError != nil {
+		response.Status = 500
+		response.Message = jsonError.Error()
+		return response
+	}
+	sendImage, err := base64.StdEncoding.DecodeString(imageRequest.Image)
 	if err != nil {
-		r.Status = 500
-		r.Message = err.Error()
-		return r
+		response.Status = 500
+		response.Message = "base64->" + err.Error() + imageRequest.Image
+		return response
 	}
 
-	if strings.HasPrefix(mediaType, "multipart/") {
-
-		body, err := base64.StdEncoding.DecodeString(request.Body)
-		if err != nil {
-			r.Status = 500
-			r.Message = err.Error()
-			return r
-		}
-
-		mr := multipart.NewReader(bytes.NewReader(body), params["boundary"])
-		p, err := mr.NextPart()
-		if err != nil && err != io.EOF {
-			r.Status = 500
-			r.Message = err.Error()
-			return r
-		}
-
-		if err != io.EOF {
-			if p.FileName() != "" {
-				buf := bytes.NewBuffer(nil)
-				if _, err := io.Copy(buf, p); err != nil {
-					r.Status = 500
-					r.Message = err.Error()
-					return r
-				}
-
-				sess, err := session.NewSession(&aws.Config{
-					Region: aws.String("us-east-1")})
-
-				if err != nil {
-					r.Status = 500
-					r.Message = err.Error()
-					return r
-				}
-
-				uploader := s3manager.NewUploader(sess)
-				_, err = uploader.Upload(&s3manager.UploadInput{
-					Bucket: bucket,
-					Key:    aws.String(filename),
-					Body:   &readSeeker{buf},
-				})
-
-				if err != nil {
-					r.Status = 500
-					r.Message = err.Error()
-					return r
-				}
-			}
-		}
-
-		status, err := bd.ModificoRegistro(usuario, IDUsuario)
-		if err != nil || !status {
-			r.Status = 400
-			r.Message = "Error al modificar registro del usuario " + err.Error()
-			return r
-		}
-	} else {
-		r.Message = "Debe enviar una imagen con el 'Content-Type' de tipo 'multipart/' en el Header"
-		r.Status = 400
-		return r
+	slideBiteImage := bytes.NewReader(sendImage)
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, slideBiteImage); err != nil {
+		response.Status = 500
+		response.Message = "Error file->" + err.Error()
+		return response
+	}
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String("us-east-1")})
+	if err != nil {
+		response.Status = 500
+		response.Message = "Error aws->" + err.Error()
+		return response
+	}
+	uploader := s3manager.NewUploader(sess)
+	_, err = uploader.Upload(&s3manager.UploadInput{
+		Bucket: bucket,
+		Key:    aws.String(fileName),
+		Body:   &readSeeker{buf},
+	})
+	if err != nil {
+		response.Status = 500
+		response.Message = "error bucket->" + err.Error()
+		return response
+	}
+	status, err := bd.ModificoRegistro(user, email)
+	if err != nil || !status {
+		response.Status = 400
+		response.Message = "Error al modificar la base de datos"
+		return response
 	}
 
-	r.Status = 200
-	r.Message = "Image Upload OK !"
-	return r
+	response.Status = 200
+	response.Message = "Todo ok"
+	return response
 }
