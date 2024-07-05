@@ -25,21 +25,22 @@ func (rs *readSeeker) Seek(offset int64, whence int) (int64, error) {
 }
 
 func UploadImage(ctx context.Context, uploadType string, request events.APIGatewayProxyRequest, claim models.Claim) models.RespApi {
+
 	var r models.RespApi
 	r.Status = 400
 	IDUsuario := claim.ID.Hex()
 
-	var fileName string
+	var filename string
 	var usuario models.Usuario
 
 	bucket := aws.String(ctx.Value(models.Key("bucketName")).(string))
 	switch uploadType {
 	case "A":
-		fileName = "avatars/" + IDUsuario + ".jpg"
-		usuario.Avatar = fileName
+		filename = "avatars/" + IDUsuario + ".jpg"
+		usuario.Avatar = filename
 	case "B":
-		fileName = "banners/" + IDUsuario + ".jpg"
-		usuario.Avatar = fileName
+		filename = "banners/" + IDUsuario + ".jpg"
+		usuario.Banner = filename
 	}
 
 	mediaType, params, err := mime.ParseMediaType(request.Headers["Content-Type"])
@@ -50,6 +51,7 @@ func UploadImage(ctx context.Context, uploadType string, request events.APIGatew
 	}
 
 	if strings.HasPrefix(mediaType, "multipart/") {
+
 		body, err := base64.StdEncoding.DecodeString(request.Body)
 		if err != nil {
 			r.Status = 500
@@ -86,7 +88,7 @@ func UploadImage(ctx context.Context, uploadType string, request events.APIGatew
 				uploader := s3manager.NewUploader(sess)
 				_, err = uploader.Upload(&s3manager.UploadInput{
 					Bucket: bucket,
-					Key:    aws.String(fileName),
+					Key:    aws.String(filename),
 					Body:   &readSeeker{buf},
 				})
 
@@ -95,10 +97,9 @@ func UploadImage(ctx context.Context, uploadType string, request events.APIGatew
 					r.Message = err.Error()
 					return r
 				}
-
 			}
-
 		}
+
 		status, err := bd.ModificoRegistro(usuario, IDUsuario)
 		if err != nil || !status {
 			r.Status = 400
@@ -110,6 +111,7 @@ func UploadImage(ctx context.Context, uploadType string, request events.APIGatew
 		r.Status = 400
 		return r
 	}
+
 	r.Status = 200
 	r.Message = "Image Upload OK !"
 	return r
