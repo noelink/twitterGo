@@ -20,18 +20,17 @@ func ObtenerImagen(ctx context.Context, uploadType string, request events.APIGat
 
 	ID := request.QueryStringParameters["id"]
 	if len(ID) < 1 {
-		r.Message = "El parametor ID es obligatorio"
+		r.Message = "El parámetro ID es obligatorio"
 		return r
 	}
 
 	perfil, err := bd.BuscoPerfil(ID)
 	if err != nil {
-		r.Message = "Usuario no encomtrado" + err.Error()
+		r.Message = "Usuario no encontrado " + err.Error()
 		return r
 	}
 
 	var filename string
-
 	switch uploadType {
 	case "A":
 		filename = perfil.Avatar
@@ -39,13 +38,13 @@ func ObtenerImagen(ctx context.Context, uploadType string, request events.APIGat
 		filename = perfil.Banner
 	}
 
-	fmt.Println("FIlename " + filename)
+	fmt.Println("Filename " + filename)
 	svc := s3.NewFromConfig(awsgo.Cfg)
 
 	file, err := downloadFromS3(ctx, svc, filename)
 	if err != nil {
 		r.Status = 500
-		r.Message = "Error descargando archivo de S3" + err.Error()
+		r.Message = "Error descargando archivo de S3 " + err.Error()
 		return r
 	}
 
@@ -54,7 +53,7 @@ func ObtenerImagen(ctx context.Context, uploadType string, request events.APIGat
 		Body:       file.String(),
 		Headers: map[string]string{
 			"Content-Type":        "application/octet-stream",
-			"Content-Disposition": fmt.Sprintf("attatchment; filename=\"%s\"", filename),
+			"Content-Disposition": fmt.Sprintf("attachment; filename=\"%s\"", filename),
 		},
 	}
 	return r
@@ -70,7 +69,7 @@ func downloadFromS3(ctx context.Context, svc *s3.Client, filename string) (*byte
 		return nil, err
 	}
 	defer obj.Body.Close()
-	fmt.Println("bucketName = " + bucket)
+	fmt.Println("bucketname = " + bucket)
 
 	file, err := ioutil.ReadAll(obj.Body)
 	if err != nil {
