@@ -11,7 +11,7 @@ import (
 func LeoUsuariosTodos(ID string, page int64, search string, tipo string) ([]*models.Usuario, bool) {
 	ctx := context.TODO()
 	db := MongoCN.Database(DatabaseName)
-	col := db.Collection("tweet")
+	col := db.Collection("usuarios")
 
 	var results []*models.Usuario
 
