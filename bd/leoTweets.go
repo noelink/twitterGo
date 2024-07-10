@@ -9,7 +9,6 @@ import (
 
 func LeoTweets(ID string, pagina int64) ([]*models.DevuelvoTweets, bool) {
 	ctx := context.TODO()
-
 	db := MongoCN.Database(DatabaseName)
 	col := db.Collection("tweet")
 
