@@ -17,6 +17,7 @@ func LeoTweetsSeguidores(request events.APIGatewayProxyRequest, claim models.Cla
 	if len(pagina) < 1 {
 		pagina = "1"
 	}
+
 	pag, err := strconv.Atoi(pagina)
 	if err != nil {
 		r.Message = "Debe enviar el parámetro Pagina como un valor mayor a 0"
@@ -29,12 +30,14 @@ func LeoTweetsSeguidores(request events.APIGatewayProxyRequest, claim models.Cla
 		return r
 	}
 
-	respJosn, err := json.Marshal(tweets)
+	respJson, err := json.Marshal(tweets)
 	if err != nil {
 		r.Status = 500
 		r.Message = "Error al formatear los datos de tweets de los seguidores"
 	}
+
 	r.Status = 200
-	r.Message = string(respJosn)
+	r.Message = string(respJson)
 	return r
+
 }
