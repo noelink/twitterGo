@@ -54,7 +54,7 @@ func Manejadores(ctx context.Context, request events.APIGatewayProxyRequest) mod
 		case "listaUsuarios":
 			return routers.ListaUsuarios(request, claim)
 		case "leoTweetSeguidores":
-			return routers.LeoTweetSeguidores(request, claim)
+			return routers.LeoTweetsSeguidores(request, claim)
 		}
 	case "PUT":
 		switch ctx.Value(models.Key("path")).(string) {
